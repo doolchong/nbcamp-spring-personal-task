@@ -47,4 +47,9 @@ public class ScheduleService {
         updateDto.setUpdate_date(String.valueOf(updateAt));
         return scheduleRepository.updateById(updateDto);
     }
+
+    public void deleteSchedule(int schedule_id, String password) {
+        scheduleRepository.deleteById(schedule_id, password);
+    }
+
 }

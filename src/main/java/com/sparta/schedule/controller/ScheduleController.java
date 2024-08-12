@@ -37,4 +37,9 @@ public class ScheduleController {
     public ScheduleResponseDto updateSchedule(@RequestBody ScheduleUpdateDto updateDto){
         return scheduleService.updateSchedule(updateDto);
     }
+
+    @DeleteMapping("/schedule/schedule_id/{schedule_id}/password/{password}")
+    public void deleteSchedule(@PathVariable int schedule_id, @PathVariable String password){
+        scheduleService.deleteSchedule(schedule_id, password);
+    }
 }

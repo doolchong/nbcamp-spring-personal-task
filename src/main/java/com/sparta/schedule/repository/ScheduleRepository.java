@@ -109,4 +109,9 @@ public class ScheduleRepository {
             }
         }, updateDto.getSchedule_id());
     }
+
+    public void deleteById(int schedule_id, String password) {
+        String sql = "DELETE FROM schedule WHERE schedule_id = ? AND password = ?";
+        jdbcTemplate.update(sql, schedule_id, password);
+    }
 }

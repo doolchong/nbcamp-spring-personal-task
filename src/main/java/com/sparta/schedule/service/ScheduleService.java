@@ -6,6 +6,8 @@ import com.sparta.schedule.entity.Schedule;
 import com.sparta.schedule.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,6 +20,9 @@ public class ScheduleService {
     }
 
     public ScheduleResponseDto create(ScheduleRequestDto requestDto){
+        LocalDate createAt = LocalDate.now();
+        requestDto.setCreation_date(String.valueOf(createAt));
+        requestDto.setUpdate_date(String.valueOf(createAt));
         Schedule schedule = new Schedule(requestDto);
 
         Schedule saveSchedule = scheduleRepository.save(schedule);

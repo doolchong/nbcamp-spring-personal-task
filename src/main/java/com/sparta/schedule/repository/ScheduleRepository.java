@@ -1,6 +1,7 @@
 package com.sparta.schedule.repository;
 
 import com.sparta.schedule.dto.ScheduleResponseDto;
+import com.sparta.schedule.dto.ScheduleUpdateDto;
 import com.sparta.schedule.entity.Schedule;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -92,5 +93,20 @@ public class ScheduleRepository {
                 return new ScheduleResponseDto(schedule, assignee_name, creation_date, update_date);
             }
         });
+    }
+
+    public ScheduleResponseDto updateById(ScheduleUpdateDto updateDto) {
+        String sql = "UPDATE schedule SET schedule = ?, assignee_name = ?, update_date = ? WHERE schedule_id = ? AND password = ?";
+        jdbcTemplate.update(sql, updateDto.getSchedule(), updateDto.getAssignee_name(), updateDto.getUpdate_date(), updateDto.getSchedule_id(), updateDto.getPassword());
+        sql = "SELECT * FROM schedule WHERE schedule_id = ?";
+        return jdbcTemplate.query(sql, resultSet -> {
+            if (resultSet.next()) {
+                return new ScheduleResponseDto(resultSet.getString("schedule"),
+                        resultSet.getString("assignee_name"),
+                        resultSet.getString("creation_date"), updateDto.getUpdate_date());
+            } else {
+                return null;
+            }
+        }, updateDto.getSchedule_id());
     }
 }

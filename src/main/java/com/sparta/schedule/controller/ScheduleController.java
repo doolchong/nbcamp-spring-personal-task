@@ -2,6 +2,7 @@ package com.sparta.schedule.controller;
 
 import com.sparta.schedule.dto.ScheduleRequestDto;
 import com.sparta.schedule.dto.ScheduleResponseDto;
+import com.sparta.schedule.dto.ScheduleUpdateDto;
 import com.sparta.schedule.service.ScheduleService;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,5 +31,10 @@ public class ScheduleController {
     @GetMapping("/schedule/inquire/param")
     public List<ScheduleResponseDto> getSchedules(@RequestParam(required = false) String update_date, @RequestParam(required = false) String assignee_name) {
         return scheduleService.getSchedules(update_date, assignee_name);
+    }
+
+    @PutMapping("/schedule")
+    public ScheduleResponseDto updateSchedule(@RequestBody ScheduleUpdateDto updateDto){
+        return scheduleService.updateSchedule(updateDto);
     }
 }

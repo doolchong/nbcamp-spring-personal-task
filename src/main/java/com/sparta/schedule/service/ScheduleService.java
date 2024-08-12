@@ -2,6 +2,7 @@ package com.sparta.schedule.service;
 
 import com.sparta.schedule.dto.ScheduleRequestDto;
 import com.sparta.schedule.dto.ScheduleResponseDto;
+import com.sparta.schedule.dto.ScheduleUpdateDto;
 import com.sparta.schedule.entity.Schedule;
 import com.sparta.schedule.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class ScheduleService {
@@ -40,4 +42,9 @@ public class ScheduleService {
         return scheduleRepository.getSchedulesList(update_date, assignee_name);
     }
 
+    public ScheduleResponseDto updateSchedule(ScheduleUpdateDto updateDto){
+        LocalDate updateAt = LocalDate.now();
+        updateDto.setUpdate_date(String.valueOf(updateAt));
+        return scheduleRepository.updateById(updateDto);
+    }
 }

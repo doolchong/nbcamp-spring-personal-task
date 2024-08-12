@@ -1,5 +1,6 @@
 package com.sparta.schedule.repository;
 
+import com.sparta.schedule.dto.ScheduleResponseDto;
 import com.sparta.schedule.entity.Schedule;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -40,5 +41,20 @@ public class ScheduleRepository {
         schedule.setId(id);
 
         return schedule;
+    }
+
+    public ScheduleResponseDto getScheduleById(int schedule_id){
+        String sql = "SELECT * FROM schedule WHERE schedule_id = ?";
+
+        return jdbcTemplate.query(sql, resultSet -> {
+            if (resultSet.next()) {
+                return new ScheduleResponseDto(resultSet.getString("schedule"),
+                        resultSet.getString("assignee_name"),
+                        resultSet.getString("creation_date"),
+                        resultSet.getString("update_date"));
+            } else {
+                return null;
+            }
+        }, schedule_id);
     }
 }

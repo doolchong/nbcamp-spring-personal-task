@@ -25,4 +25,8 @@ public class ScheduleService {
 
         return scheduleResponseDto;
     }
+
+    public ScheduleResponseDto getSchedule(int scheduleId) {
+        return scheduleRepository.getScheduleById(scheduleId);
+    }
 }

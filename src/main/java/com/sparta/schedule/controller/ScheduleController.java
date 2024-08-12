@@ -5,6 +5,8 @@ import com.sparta.schedule.dto.ScheduleResponseDto;
 import com.sparta.schedule.service.ScheduleService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class ScheduleController {
@@ -16,12 +18,17 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedule")
-    public ScheduleResponseDto createSchedule(@RequestBody ScheduleRequestDto requestDto){
-        return scheduleService.createSchedule(requestDto);
+    public ScheduleResponseDto create(@RequestBody ScheduleRequestDto requestDto){
+        return scheduleService.create(requestDto);
     }
 
     @GetMapping("/schedule/inquire/{schedule_id}")
     public ScheduleResponseDto getSchedule(@PathVariable int schedule_id){
         return scheduleService.getSchedule(schedule_id);
+    }
+
+    @GetMapping("/schedule/inquire/param")
+    public List<ScheduleResponseDto> getSchedules(@RequestParam(required = false) String update_date, @RequestParam(required = false) String assignee_name) {
+        return scheduleService.getSchedules(update_date, assignee_name);
     }
 }

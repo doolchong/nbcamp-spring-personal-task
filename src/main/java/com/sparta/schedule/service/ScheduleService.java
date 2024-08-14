@@ -1,16 +1,15 @@
 package com.sparta.schedule.service;
 
-import com.sparta.schedule.dto.ScheduleRequestDto;
+import com.sparta.schedule.dto.RequestDto;
 import com.sparta.schedule.dto.ScheduleResponseDto;
-import com.sparta.schedule.dto.ScheduleUpdateDto;
+import com.sparta.schedule.dto.UpdateDto;
+import com.sparta.schedule.entity.Assignee;
 import com.sparta.schedule.entity.Schedule;
 import com.sparta.schedule.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class ScheduleService {
@@ -21,30 +20,38 @@ public class ScheduleService {
         this.scheduleRepository = scheduleRepository;
     }
 
-    public ScheduleResponseDto create(ScheduleRequestDto requestDto){
-        LocalDate createAt = LocalDate.now();
-        requestDto.setCreation_date(String.valueOf(createAt));
-        requestDto.setUpdate_date(String.valueOf(createAt));
+    public ScheduleResponseDto create(RequestDto requestDto){
+        LocalDateTime registration_date = LocalDateTime.now();
+        requestDto.setRegistration_date(registration_date);
+        requestDto.setModification_date(registration_date);
+
+        boolean isExist = scheduleRepository.isExist(requestDto.getAssignee_id());
+        Assignee assignee = new Assignee(requestDto);
+        ScheduleResponseDto responseDto = new ScheduleResponseDto(assignee);
+
+        if(isExist){
+            scheduleRepository.saveAssignee(assignee);
+        }
+
         Schedule schedule = new Schedule(requestDto);
+        schedule.setAssignee_id(assignee.getAssignee_id());
+        responseDto.setSchedule(scheduleRepository.saveSchedule(schedule).getSchedule());
 
-        Schedule saveSchedule = scheduleRepository.save(schedule);
-
-        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(schedule);
-
-        return scheduleResponseDto;
+        return responseDto;
     }
 
     public ScheduleResponseDto getSchedule(int scheduleId) {
         return scheduleRepository.getScheduleById(scheduleId);
     }
 
-    public List<ScheduleResponseDto> getSchedules(String update_date, String assignee_name) {
-        return scheduleRepository.getSchedulesList(update_date, assignee_name);
+    public List<ScheduleResponseDto> getSchedules(String modification_date, String assignee_name) {
+        return scheduleRepository.getSchedulesList(modification_date, assignee_name);
     }
 
-    public ScheduleResponseDto updateSchedule(ScheduleUpdateDto updateDto){
-        LocalDate updateAt = LocalDate.now();
-        updateDto.setUpdate_date(String.valueOf(updateAt));
+    public ScheduleResponseDto updateSchedule(UpdateDto updateDto){
+        LocalDateTime registration_date = LocalDateTime.now();
+        updateDto.setModification_date(registration_date);
+        updateDto.setUpdated_date(registration_date);
         return scheduleRepository.updateById(updateDto);
     }
 

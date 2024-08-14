@@ -1,35 +1,29 @@
 package com.sparta.schedule.entity;
 
-import com.sparta.schedule.dto.ScheduleRequestDto;
+import com.sparta.schedule.dto.RequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class Schedule {
 
-    private int id;
+    private int schedule_id;
     private String schedule;
-    private String assignee_name;
     private String password;
-    private String creation_date;
-    private String update_date;
+    private int assignee_id;
+    private LocalDateTime created_date;
+    private LocalDateTime updated_date;
 
-    public Schedule(ScheduleRequestDto requestDto) {
-        this.schedule = requestDto.getSchedule();
-        this.assignee_name = requestDto.getAssignee_name();
-        this.password = requestDto.getPassword();
-        this.creation_date = requestDto.getCreation_date();
-        this.update_date = requestDto.getUpdate_date();
-    }
-
-    public void update(ScheduleRequestDto requestDto){
-        this.schedule = requestDto.getSchedule();
-        this.assignee_name = requestDto.getAssignee_name();
-        this.password = requestDto.getPassword();
-        this.creation_date = requestDto.getCreation_date();
-        this.update_date = requestDto.getUpdate_date();
+    public Schedule(RequestDto requestDto) {
+        schedule = requestDto.getSchedule();
+        password = requestDto.getPassword();
+        created_date = requestDto.getRegistration_date();
+        updated_date = requestDto.getModification_date();
     }
 }

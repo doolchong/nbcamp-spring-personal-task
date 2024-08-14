@@ -3,14 +3,16 @@ package com.sparta.schedule.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
-public class ScheduleUpdateDto {
+public class UpdateDto {
 
     private int schedule_id;
     private String schedule;
     private String assignee_name;
     private String password;
-    private String creation_date;
-    private String update_date;
+    private LocalDateTime modification_date;
+    private LocalDateTime updated_date;
 }

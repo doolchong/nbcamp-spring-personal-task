@@ -4,6 +4,8 @@ import com.sparta.schedule.dto.ScheduleResponseDto;
 import com.sparta.schedule.dto.UpdateDto;
 import com.sparta.schedule.entity.Assignee;
 import com.sparta.schedule.entity.Schedule;
+import com.sparta.schedule.exception.CustomException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,6 +16,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ScheduleRepository {
@@ -24,7 +27,7 @@ public class ScheduleRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean isExist(int assignee_id){
+    public boolean isExist(int assignee_id) {
         String sql = "SELECT * FROM assignee WHERE assignee_id = ?";
 
         return Boolean.TRUE.equals(jdbcTemplate.query(sql, resultSet -> {
@@ -86,7 +89,7 @@ public class ScheduleRepository {
 
         return jdbcTemplate.query(sql, resultSet -> {
             if (resultSet.next()) {
-                return new ScheduleResponseDto(resultSet.getString("s.schedule") ,
+                return new ScheduleResponseDto(resultSet.getString("s.schedule"),
                         resultSet.getString("a.assignee_name"),
                         resultSet.getString("a.email"),
                         resultSet.getTimestamp("s.created_date").toLocalDateTime(),
@@ -131,6 +134,9 @@ public class ScheduleRepository {
     }
 
     public ScheduleResponseDto updateById(UpdateDto updateDto) {
+        isExistId(updateDto.getSchedule_id());
+        isEqualPassword(updateDto.getSchedule_id(), updateDto.getPassword());
+
         String sql = "UPDATE schedule AS s JOIN assignee AS a ON s.assignee_id = a.assignee_id SET s.schedule = ?, a.assignee_name = ?, s.updated_date = ?, a.modification_date = ? WHERE schedule_id = ? AND password = ?";
         jdbcTemplate.update(sql, updateDto.getSchedule(), updateDto.getAssignee_name(), updateDto.getUpdated_date(), updateDto.getModification_date(), updateDto.getSchedule_id(), updateDto.getPassword());
 
@@ -147,7 +153,47 @@ public class ScheduleRepository {
     }
 
     public void deleteById(int schedule_id, String password) {
+        isExistId(schedule_id);
+        isEqualPassword(schedule_id, password);
+
         String sql = "DELETE FROM schedule WHERE schedule_id = ? AND password = ?";
         jdbcTemplate.update(sql, schedule_id, password);
+    }
+
+    public List<ScheduleResponseDto> getSchedulesPage(int page, int size) {
+        // 페이지 번호와 페이지 크기로부터 limit과 offset 계산
+        int limit = size;
+        int offset = page * size;
+
+        String sql = "SELECT * FROM schedule AS s JOIN assignee AS a ON s.assignee_id = a.assignee_id LIMIT ? OFFSET ?";
+
+        // 쿼리 실행
+        return jdbcTemplate.query(sql, new Object[]{limit, offset}, new RowMapper<ScheduleResponseDto>() {
+            @Override
+            public ScheduleResponseDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+                String schedule = rs.getString("s.schedule");
+                String assignee_name = rs.getString("a.assignee_name");
+                String email = rs.getString("a.email");
+                LocalDateTime created_date = rs.getTimestamp("s.created_date").toLocalDateTime();
+                LocalDateTime updated_date = rs.getTimestamp("s.updated_date").toLocalDateTime();
+                return new ScheduleResponseDto(schedule, assignee_name, email, created_date, updated_date);
+            }
+        });
+    }
+
+    private void isExistId(int schedule_id) {
+        String sql = "SELECT schedule_id FROM schedule WHERE schedule_id = ?";
+        Optional<Integer> id = Optional.ofNullable(jdbcTemplate.queryForObject(sql, Integer.class, schedule_id));
+        if (id.isEmpty()) {
+            throw new EmptyResultDataAccessException(404);
+        }
+    }
+
+    private void isEqualPassword(int schedule_id, String password) {
+        String sql = "SELECT password FROM schedule WHERE schedule_id = ?";
+        String p = jdbcTemplate.queryForObject(sql, String.class, schedule_id);
+        if (!password.equals(p)) {
+            throw new CustomException("\n비밀번호가 일치하지 않습니다.");
+        }
     }
 }

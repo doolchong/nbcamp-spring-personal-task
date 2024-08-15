@@ -5,12 +5,18 @@ import com.sparta.schedule.dto.ScheduleResponseDto;
 import com.sparta.schedule.dto.UpdateDto;
 import com.sparta.schedule.exception.CustomException;
 import com.sparta.schedule.service.ScheduleService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@Validated
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -20,8 +26,13 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedule")
-    public ScheduleResponseDto createSchedule(@RequestBody RequestDto requestDto) {
-        return scheduleService.create(requestDto);
+    public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody RequestDto requestDto) {
+        ScheduleResponseDto scheduleResponseDto = scheduleService.create(requestDto);
+        if (scheduleResponseDto == null) {
+            return new ResponseEntity<ScheduleResponseDto>(HttpStatus.CREATED);
+        } else {
+            return ResponseEntity.ok().body(scheduleResponseDto);
+        }
     }
 
 
@@ -36,8 +47,13 @@ public class ScheduleController {
     }
 
     @PutMapping("/schedule")
-    public ScheduleResponseDto updateSchedule(@RequestBody UpdateDto updateDto) throws CustomException {
-        return scheduleService.updateSchedule(updateDto);
+    public ResponseEntity<ScheduleResponseDto> updateSchedule(@Valid @RequestBody UpdateDto updateDto) {
+        ScheduleResponseDto scheduleResponseDto = scheduleService.updateSchedule(updateDto);
+        if (scheduleResponseDto == null) {
+            return new ResponseEntity<ScheduleResponseDto>(HttpStatus.CREATED);
+        } else {
+            return ResponseEntity.ok().body(scheduleResponseDto);
+        }
     }
 
     @DeleteMapping("/schedule/schedule_id/{schedule_id}/password/{password}")

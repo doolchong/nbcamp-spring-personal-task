@@ -58,7 +58,7 @@ public class ScheduleService {
         return scheduleResponseDtoList;
     }
 
-    public ScheduleResponseDto updateSchedule(UpdateDto updateDto) throws CustomException {
+    public ScheduleResponseDto updateSchedule(UpdateDto updateDto) {
         LocalDateTime registration_date = LocalDateTime.now();
         updateDto.setModification_date(registration_date);
         updateDto.setUpdated_date(registration_date);
